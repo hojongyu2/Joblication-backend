@@ -8,6 +8,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const UserModel = require('./models/UserModels');
 const jwt = require('jsonwebtoken');
+const searchRouter = require('./routes/searchRouter')
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use(cors({
     credentials:true,
     origin: "http://localhost:3000",
 }));
+// app.use(cors)
 
 app.use(cookieParser());
 
@@ -49,12 +51,13 @@ app.use(async (req, res, next) => {
     req.user = foundUser;
 
     return next();
-    
+
   } catch (error) {
     next(error);
   }
 });
 //userRoutes
 app.use(userRouter);
+app.use(searchRouter);
 
 app.listen(port, () => console.log("joblication is working properly"));
