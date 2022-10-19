@@ -8,7 +8,9 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const UserModel = require('./models/UserModels');
 const jwt = require('jsonwebtoken');
-const searchRouter = require('./routes/searchRouter')
+const searchRouter = require('./routes/searchRouter');
+const joblicationRouter = require("./routes/joblicationRouter");
+const noteRouter = require("./routes/noteRouter");
 
 const app = express();
 
@@ -59,5 +61,7 @@ app.use(async (req, res, next) => {
 //userRoutes
 app.use(userRouter);
 app.use(searchRouter);
+app.use(joblicationRouter);
+app.use(noteRouter);
 
 app.listen(port, () => console.log("joblication is working properly"));
