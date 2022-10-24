@@ -15,11 +15,7 @@ searchRouter.post("/job-search", async (req, res, next) => {
         `https://api.whatjobs.com/api/v1/jobs.json?publisher=3785&user_ip=100.8.240.174&keyword=${jobTitle}&location=${location}&radius=100&limit=50&page=${pageNumber}`
       );
       const total = jobResponse.data.total;
-        // res.json(total)
-      if (total === 0){
-          return res.send("Sorry, there are currently no results for your search. Please try another search term.")
-      }
-      // console.log(jobResponse.data.data.map((x)=>x.title));
+      
       // using for loop to get all page nated data and stored in an empty array
       const currentPage = Number(jobResponse.data.current_page);
       const lastPage = jobResponse.data.last_page;
@@ -34,7 +30,7 @@ searchRouter.post("/job-search", async (req, res, next) => {
       res.json({searchResult:pagenatedData, total});
     }
   } catch (error) {
-    next(error);
+    next(error)
   }
 });
 

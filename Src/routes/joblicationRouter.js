@@ -1,12 +1,12 @@
 const express = require("express")
 const joblicationModel = require("../models/joblicationModels")
+const noteModel = require("../models/noteModels")
 
 const joblicationRouter = express.Router()
 
 joblicationRouter.post("/joblication", (req, res, next) => {
     const { jobTitle, company, location, url } = req.body
     const userId = req.user.id
-    console.log(userId)
     try {
         if(!req.user._id){
             res.send(401).send("you need to log in first");
@@ -27,12 +27,32 @@ joblicationRouter.post("/joblication", (req, res, next) => {
     
 })
 
-// joblicationRouter.post("/save-note", (req, res, next)=>{
-//     try {
+joblicationRouter.post("/delete-company", async(req, res, next)=>{
+    try {
+        const { savedCompanyId } = req.body;
+        const deleteCompany = await joblicationModel.deleteOne(({ _id: savedCompanyId} ));
+        const deleteNote = await noteModel.deleteMany({ savedCompanyId: savedCompanyId })
+        // when deleting saved company, notes that are related to that company will also going to be deleted
         
-//     } catch (error) {
-//         next(error)
-//     }
-// })
+        if(deleteCompany.acknowledged){
+            res.send(deleteCompany.acknowledged)
+        }else {
+            res.status(400).send("error occured, please sign-out and log-in again")
+        }
+    } catch (error) {
+        next(error)
+    }
+})
+
+joblicationRouter.get("/get-savedCompany", async (req, res, next)=>{
+    try {
+        const signInId = req.user.id
+        const foundCompany = await joblicationModel.find({userId: signInId})
+        res.send(foundCompany)
+        // console.log(foundCompany)
+    } catch (error) {
+        next(error)
+    }
+})
 
 module.exports = joblicationRouter;

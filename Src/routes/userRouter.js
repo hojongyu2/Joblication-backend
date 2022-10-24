@@ -4,18 +4,18 @@ const UserModel = require("../models/UserModels");
 const jwt = require("jsonwebtoken");
 
 const cleanUser = (userDocument) => {
-    return {
-        id: userDocument._id,
-        firstName: userDocument.firstName,
-        lastName: userDocument.lastName,
-        email: userDocument.email,
-        jobTitle: userDocument.jobTitle,
-        isAdmin: userDocument.isAdmin,
-    };
+  return {
+    id: userDocument._id,
+    firstName: userDocument.firstName,
+    lastName: userDocument.lastName,
+    email: userDocument.email,
+    jobTitle: userDocument.jobTitle,
+    isAdmin: userDocument.isAdmin,
+  };
 };
 
 const getToken = (userId) => {
-    return jwt.sign({ userId, iat: Date.now() }, process.env.AUTH_SECRET_KEY);
+  return jwt.sign({ userId, iat: Date.now() }, process.env.AUTH_SECRET_KEY);
 };
 
 const userRouter = express.Router();
@@ -29,7 +29,7 @@ userRouter.post("/register-user", async (req, res, next) => {
   const { firstName, lastName, email, password, jobTitle } = req.body;
   //console.log(req.body)
   const hashedPassword = await bcrypt.hash(password, 5);
-  console.log(hashedPassword);
+  // console.log(hashedPassword);
 
   try {
     const userDocument = new UserModel({
@@ -38,6 +38,7 @@ userRouter.post("/register-user", async (req, res, next) => {
       email,
       hashedPassword,
       jobTitle,
+      isAdmin: false,
     });
     userDocument.save();
 
@@ -55,7 +56,12 @@ userRouter.post("/sign-in", async (req, res, next) => {
   try {
     const foundUser = await UserModel.findOne({ email: email });
     if (!foundUser) {
-      return res.status(401).send("user not found");
+      return res
+        .json({
+          success: false,
+          message: "Your Email or password was incorrect",
+        })
+        .status(401);
     }
     const passwrodMatch = await bcrypt.compare(
       password,
@@ -63,7 +69,12 @@ userRouter.post("/sign-in", async (req, res, next) => {
     );
     // console.log(passwrodMatch)
     if (!passwrodMatch) {
-      return res.status(401).send("wrong password");
+      return res
+        .json({
+          success: false,
+          message: "Your Email or password was incorrect",
+        })
+        .status(401);
     }
 
     const token = getToken(foundUser._id);
@@ -71,6 +82,30 @@ userRouter.post("/sign-in", async (req, res, next) => {
     res.json({ user: cleanUser(foundUser) });
   } catch (error) {
     next(error);
+  }
+});
+
+userRouter.post("/edit-user", async (req, res, next) => {
+  try {
+    const { firstName, lastName, email, oldPassword, newPassword, matchPassword, jobTitle } = req.body;
+    const userId = req.user.id
+    const foundUser = await UserModel.find({ _id: userId });
+    const storedPassword = foundUser[0].hashedPassword
+    if(await bcrypt.compare(oldPassword, foundUser[0].hashedPassword)) {
+      const updateUser = await UserModel.findOneAndUpdate({ _id: userId }, {
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        hashedPassword: await bcrypt.hash(newPassword, 5),
+        jobTitle: jobTitle
+      })
+      const foundUpdatedUser = await UserModel.find({_id: userId });
+      res.json({success: true, message: foundUpdatedUser[0]})
+    }else {
+      res.json({success: false, message: "Password does not match"})
+    }
+  } catch (error) {
+    next(error); 
   }
 });
 

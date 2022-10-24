@@ -11,7 +11,7 @@ const jwt = require('jsonwebtoken');
 const searchRouter = require('./routes/searchRouter');
 const joblicationRouter = require("./routes/joblicationRouter");
 const noteRouter = require("./routes/noteRouter");
-
+const adminRouter = require("./routes/adminRouter")
 const app = express();
 
 mongoose
@@ -63,5 +63,6 @@ app.use(userRouter);
 app.use(searchRouter);
 app.use(joblicationRouter);
 app.use(noteRouter);
+app.use(adminRouter);
 
 app.listen(port, () => console.log("joblication is working properly"));
