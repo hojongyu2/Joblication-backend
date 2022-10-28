@@ -32,6 +32,10 @@ userRouter.post("/register-user", async (req, res, next) => {
   // console.log(hashedPassword);
 
   try {
+    const existUser = await UserModel.findOne({ email: email })
+    if(existUser){
+     return res.json({result: false, message: "User exist"}).status(401)
+    }
     const userDocument = new UserModel({
       firstName,
       lastName,
@@ -46,7 +50,7 @@ userRouter.post("/register-user", async (req, res, next) => {
     // res.cookie("session_token", token, { httpOnly: true, secure: false });
     res.json({ user: cleanUser(userDocument) });
   } catch (error) {
-    next(error);
+    next(error)
   }
 });
 
@@ -59,7 +63,7 @@ userRouter.post("/sign-in", async (req, res, next) => {
       return res
         .json({
           success: false,
-          message: "Your Email or password was incorrect",
+          message: "Your email or password was incorrect",
         })
         .status(401);
     }

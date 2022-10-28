@@ -18,6 +18,7 @@ joblicationRouter.post("/joblication", (req, res, next) => {
             location,
             url,
             userId:req.user._id,
+            joblicationStatus: "watch",
         })
         jobDocument.save()
         res.json({savedCompanyId:jobDocument.id})
@@ -27,7 +28,7 @@ joblicationRouter.post("/joblication", (req, res, next) => {
     
 })
 
-joblicationRouter.post("/delete-company", async(req, res, next)=>{
+joblicationRouter.post("/delete-company", async(req, res, next) => {
     try {
         const { savedCompanyId } = req.body;
         const deleteCompany = await joblicationModel.deleteOne(({ _id: savedCompanyId} ));
@@ -44,12 +45,25 @@ joblicationRouter.post("/delete-company", async(req, res, next)=>{
     }
 })
 
-joblicationRouter.get("/get-savedCompany", async (req, res, next)=>{
+joblicationRouter.get("/get-savedCompany", async (req, res, next) => {
     try {
         const signInId = req.user.id
         const foundCompany = await joblicationModel.find({userId: signInId})
         res.send(foundCompany)
-        // console.log(foundCompany)
+    } catch (error) {
+        next(error)
+    }
+})
+
+joblicationRouter.post("/joblication-status", async (req, res, next) => {
+    try {
+        const { companyId, joblicationStatus } = req.body;
+        const userId = req.user.id
+        const foundCompanyAndUpdated= await joblicationModel.findOneAndUpdate({ userId: userId, _id: companyId}, {
+            joblicationStatus: joblicationStatus,
+        })
+        const foundUpdatedCompany = await joblicationModel.find({userId: userId})
+        res.json({success:true, message: foundUpdatedCompany})
     } catch (error) {
         next(error)
     }

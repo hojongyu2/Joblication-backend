@@ -46,7 +46,7 @@ adminRouter.post("/assign-admin", async (req, res, next) => {
     const { userId } = req.body;
     const foundUser = await UserModel.find({ _id: userId });
     const isAdminTrue = foundUser[0].isAdmin
-    console.log(foundUser)
+    // console.log(foundUser)
     // conditional statement to assign user as admin
     if(!isAdminTrue){
         const toTrue = await UserModel.findOneAndUpdate({ _id: userId }, { isAdmin: true})
