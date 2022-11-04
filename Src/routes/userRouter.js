@@ -27,9 +27,7 @@ userRouter.get("/sign-out", (req, res, next) => {
 
 userRouter.post("/register-user", async (req, res, next) => {
   const { firstName, lastName, email, password, jobTitle } = req.body;
-  //console.log(req.body)
   const hashedPassword = await bcrypt.hash(password, 5);
-  // console.log(hashedPassword);
 
   try {
     const existUser = await UserModel.findOne({ email: email })
@@ -71,7 +69,6 @@ userRouter.post("/sign-in", async (req, res, next) => {
       password,
       foundUser.hashedPassword
     );
-    // console.log(passwrodMatch)
     if (!passwrodMatch) {
       return res
         .json({

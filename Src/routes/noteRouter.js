@@ -31,7 +31,7 @@ noteRouter.post("/get-notes", async (req, res, next) => {
     try {
         const { savedCompanyId } = req.body;
         const userId = req.user.id
-        // console.log(savedCompanyId)
+
         const foundNote = await noteModel.find({ savedCompanyId: savedCompanyId, userId: userId});
         res.json(foundNote)
     } catch (error) {
@@ -43,7 +43,7 @@ noteRouter.post('/delete-note', async (req, res, next) => {
     try {
         const { savedCompanyId, note } = req.body;
         const foundNote = await noteModel.deleteOne({ note: note, savedCompanyId: savedCompanyId});
-        // console.log("foundNote: ", foundNote)
+
         res.json(foundNote.acknowledged)
     } catch (error) {
         next(error)
