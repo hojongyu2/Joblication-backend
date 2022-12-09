@@ -59,10 +59,10 @@ app.use(async (req, res, next) => {
   }
 });
 //userRoutes
-app.use(userRouter);
-app.use(searchRouter);
-app.use(joblicationRouter);
-app.use(noteRouter);
-app.use(adminRouter);
+app.use('/api', userRouter);
+app.use('/api', searchRouter);
+app.use('/api', joblicationRouter);
+app.use('/api', noteRouter);
+app.use('/api', adminRouter);
 
 app.listen(port, () => console.log("joblication is working properly"));
